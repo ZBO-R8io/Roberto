@@ -1,0 +1,4 @@
+<launch>
+	<param name="lunarbot" command="xacro '$(find lunarbot)/urdf/lunarbot.xacro'">
+
+</launch>
