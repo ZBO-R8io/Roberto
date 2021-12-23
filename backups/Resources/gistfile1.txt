@@ -1,0 +1,125 @@
+# quick gist to accompany post on building ROS Melodic w/python3 support
+# https://www.miguelalonsojr.com/blog/robotics/ros/python3/2019/08/20/ros-# melodic-python-3-build.html
+# Warning: don't try to run this as a script. It probably won't work.
+
+# remove all things python (optional)
+sudo apt-get remove python-*
+
+# remove previous installations of ROS
+sudo apt-get remove ros-*
+sudo apt-get remove ros-melodic-*
+sudo apt-get autoremove
+
+# setup python3 dependencies
+sudo apt update
+sudo apt install -y python3 python3-dev python3-pip build-essential
+sudo -H pip3 install rosdep rospkg rosinstall_generator rosinstall wstool vcstools catkin_tools catkin_pkg
+
+# initialize catkin build environment
+sudo rosdep init
+rosdep update
+cd ~
+mkdir ros_catkin_ws/src
+cd ros_catkin_ws
+# TODO: get rqt_rviz rviz_plugin_tutorials librviz_tutorial building w/python3
+catkin config --init -DCMAKE_BUILD_TYPE=Release --blacklist rqt_rviz rviz_plugin_tutorials librviz_tutorial --install
+
+# setup ROS install
+rosinstall_generator desktop_full --rosdistro melodic --deps --tar > melodic-desktop-full.rosinstall
+wstool init -j8 src melodic-desktop-full.rosinstall
+# if packages fail to download, run the following
+wstool update -j4 -t src
+
+# setup environment and install dependencies
+export ROS_PYTHON_VERSION=3
+python3 -m pip install --upgrade pip
+python3 -m pip install --upgrade Pillow
+pip3 install -U -f https://extras.wxpython.org/wxPython4/extras/linux/gtk3/ubuntu-18.04 wxPython
+
+# create the following script in the ros_catkin_ws directory and call it
+# "install_skip":[
+#!/bin/bash
+#Check whether root
+if [ $(whoami) != root ]; then
+    echo You must be root or use sudo to install packages.
+    return
+fi
+
+#Call apt-get for each package
+for pkg in "$@"
+do
+    echo "Installing $pkg"
+    sudo apt-get -my install $pkg >> install.log
+done
+]<--# do not include these brackets; these are to help identify what to
+# copy/paste
+# and chmod it
+chmod +x install_skip
+
+# sed magic
+sudo ./install_skip `rosdep check --from-paths src --ignore-src | grep python | sed -e "s/^apt\t//g" | sed -z "s/\n/ /g" | sed -e "s/python/python3/g"`
+rosdep install --from-paths src --ignore-src -y --skip-keys="`rosdep check --from-paths src --ignore-src | grep python | sed -e "s/^apt\t//g" | sed -z "s/\n/ /g"`"
+find . -type f -exec sed -i 's/\/usr\/bin\/env[ ]*python/\/usr\/bin\/env python3/g' {} +
+
+# build ROS
+mkdir install
+sudo apt-get install python3-empy
+sudo apt-get install python-empy
+catkin build -j2 -l2
+
+# export PYTHON_PATH
+export PYTHON_PATH=/usr/lib/python3/dist-packages
+
+# source the setup in the devel directory
+source ~/ros_catkin_ws/install/setup.bash
+
+# other things to setup
+sudo apt-get install python3-nose
+sudo apt-get install python3-catkin-pkg
+sudo apt-get install python-catkin-pkg
+
+# build catkin_ws
+cd
+mkdir -p catkin_ws/src
+cd catkin_ws
+catkin_make --cmake-args -DPYTHON_VERSION=3
+
+# source your catkin_ws pkg
+cd
+nano .bashrc
+# scroll to bottom of file
+source ~/catkin_ws/devel/setup.bash
+CTL-X
+Y
+"Enter"
+
+# finish setup for roscore
+sudo apt-get install python3-defusedxml
+
+# rqt_graph fixes
+pip3 install pydot
+
+# setup for rostopic
+pip3 install pycryptodome
+# change the following lines in ~/ros_catkin_ws/install/lib/python3/dist
+# packages/rosbag/bag.py
+# Change line 53 from Cryptodome.Cipher import AES to from Crypto.Cipher
+# import AES
+# Change line 54 from  from Cryptodome.Random import get_random_bytes to
+# from Crypto.Random import get_random_bytes
+pip3 install gnupg
+
+# install git
+cd ~
+sudo apt install git
+
+# use git to clone joint_state_publisher repo
+git clone https://github.com/ros/joint_state_publisher.git
+
+# go into the joint_state_publisher directory and copy/paste the joint_state_publisher_gui directory
+cd ~/joint_state_publisher
+cp joint_state_publisher_gui ~/ros_catkin_ws/src/joint_state_publisher_gui
+
+# build the package
+cd ~/ros_catkin_ws
+catkin build joint_state_publisher_gui

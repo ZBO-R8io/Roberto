@@ -1,0 +1,68 @@
+source devel/setup.bash
+
+catkin_create_pkg <pkg_name> std_msgs rospy rpscpp
+
+catkin_make
+
+rospack depends1 <pkg_name>
+
+cat package.xml
+
+rospack depends1 rospy
+
+rospack depends <pkg_name>
+
+roscore
+
+rosnode list
+
+rosnode info /rosout
+
+rosrun [pkg_name] [node_name]
+
+rosrun [pgk_name] [node_name] __name:=[new_node_name]
+
+rosnode ping [node_name]
+
+rosrun rqt_graph rqt_graph
+
+rostopic -h
+
+rostopic echo [topic]
+
+rostopic list -h
+
+rostopic list -v
+
+rostopic type [topic]
+
+rosmsg show [msg_type]
+
+rostopic pub [topic] [msg_type] [args]
+Note: YAML_syntax_('[linear]' '[angular]') = '[x.x, y.y, z.z]' '[x.x, y.y, z.z]'
+
+rostopic hz [topic]
+
+rostopic type [topic] | rosmsg show
+
+rosrun rqt_plot rqt_plot
+
+rosrun rqt_console rqt_console
+
+rosrun rqt_logger-level rqt_logger_level
+
+roslaunch [package] [filename.launch]
+
+rosed [package_name] [filename]
+
+rosed [package_name] <tab><tab>
+
+rosbag record -a
+
+rosbag info <your bagfile>
+
+rosbag play <your bagfile>
+
+rosbag play -r 2 <your bagfile>
+
+rosbag record -O subset [topic1] [topic2]
