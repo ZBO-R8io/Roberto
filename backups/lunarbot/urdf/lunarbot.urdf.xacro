@@ -12,9 +12,6 @@
   <material name="white">
     <color rgba="1 1 1 1"/>
   </material>
-  <!--Add <gazebo> element to <robot>, <link>, and <joint> elements-->
-  <gazebo>
-	</gazebo>
   <!--Links-->
   <!--Body(base_link)-->
   <link name="base_link">
@@ -37,8 +34,6 @@
       <!--6 values: ixx ixy ixz iyy iyz izz-->
       <inertia ixx="4.05" ixy="0" ixz="0" iyy="9.82" iyz="0" izz="12.25"/>
     </inertial>
-    <gazebo>
-		</gazebo>
   </link>
   <link name="link_0">
     <visual>
@@ -58,16 +53,12 @@
       <mass value="12.01"/>
       <inertia ixx=".14" ixy="0" ixz="0" iyy="0.24" iyz="0" izz=".14"/>
     </inertial>
-    <gazebo>
-			</gazebo>
   </link>
   <joint name="joint_0" type="continuous">
     <parent link="base_link"/>
     <child link="link_0"/>
     <axis xyz="0 1 0"/>
     <origin rpy="0 0 0" xyz="0.3 0.375 -0.075"/>
-    <gazebo>
-			</gazebo>
   </joint>
   <link name="link_1">
     <visual>
@@ -87,16 +78,12 @@
       <mass value="12.01"/>
       <inertia ixx=".14" ixy="0" ixz="0" iyy="0.24" iyz="0" izz=".14"/>
     </inertial>
-    <gazebo>
-			</gazebo>
   </link>
   <joint name="joint_1" type="continuous">
     <parent link="base_link"/>
     <child link="link_1"/>
     <axis xyz="0 1 0"/>
     <origin rpy="0 0 0" xyz="0.3 -0.375 -0.075"/>
-    <gazebo>
-			</gazebo>
   </joint>
   <link name="link_2">
     <visual>
@@ -116,16 +103,12 @@
       <mass value="12.01"/>
       <inertia ixx=".14" ixy="0" ixz="0" iyy="0.24" iyz="0" izz=".14"/>
     </inertial>
-    <gazebo>
-			</gazebo>
   </link>
   <joint name="joint_2" type="continuous">
     <parent link="base_link"/>
     <child link="link_2"/>
     <axis xyz="0 1 0"/>
     <origin rpy="0 0 0" xyz="-0.3 0.375 -0.075"/>
-    <gazebo>
-			</gazebo>
   </joint>
   <link name="link_3">
     <visual>
@@ -145,16 +128,18 @@
       <mass value="12.01"/>
       <inertia ixx=".14" ixy="0" ixz="0" iyy="0.24" iyz="0" izz=".14"/>
     </inertial>
-    <gazebo>
-			</gazebo>
   </link>
   <joint name="joint_3" type="continuous">
     <parent link="base_link"/>
     <child link="link_3"/>
     <axis xyz="0 1 0"/>
     <origin rpy="0 0 0" xyz="-0.3 -0.375 -0.075"/>
-    <gazebo>
-			</gazebo>
   </joint>
+  <!--Plugin ties Gazebo to ROS-->
+  <gazebo>
+    <plugin filename="libgazebo_ros_control.so" name="gazebo_ros_control">
+      <robotNamespace>/</robotNamespace>
+    </plugin>
+  </gazebo>
 </robot>
 

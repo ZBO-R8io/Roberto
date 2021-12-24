@@ -12,10 +12,6 @@
     <color rgba="1 1 1 1"/>
   </material>
 
-	<!--Add <gazebo> element to <robot>, <link>, and <joint> elements-->
-	<gazebo>
-	</gazebo>
-
   <!--Xacro Macros-->
   <!--Body Macros-->
   <xacro:property name="body_size" value="1.0 0.6 0.3" />
@@ -43,8 +39,6 @@
         <mass value="12.01"/>
         <inertia ixx=".14" ixy="0" ixz="0" iyy="0.24" iyz="0" izz=".14"/>
       </inertial>
-			<gazebo>
-			</gazebo>
     </link>
 
     <joint name="joint_${suffix}" type="continuous">
@@ -52,8 +46,6 @@
       <child link="link_${suffix}"/>
       <axis xyz="0 1 0"/>
       <origin rpy="0 0 0" xyz="${reflect_x * 0.3} ${reflect_y * 0.375} ${reflect_z * 0.075}"/>
-			<gazebo>
-			</gazebo>
     </joint>
   </xacro:macro>
 
@@ -79,8 +71,6 @@
       <!--6 values: ixx ixy ixz iyy iyz izz-->
       <inertia ixx="4.05" ixy="0" ixz="0" iyy="9.82" iyz="0" izz="12.25"/>
     </inertial>
-		<gazebo>
-		</gazebo>
   </link>
 
   <!--wheel/joint_0-->
@@ -91,5 +81,12 @@
   <xacro:wheel suffix="2" reflect_x="-1" reflect_y="1" reflect_z="-1" />
   <!--wheel/joint_3-->
   <xacro:wheel suffix="3" reflect_x="-1" reflect_y="-1" reflect_z="-1" />
+
+	<!--Plugin ties Gazebo to ROS-->
+	<gazebo>
+		<plugin name="gazebo_ros_control" filename="libgazebo_ros_control.so">
+			<robotNamespace>/</robotNamespace>
+		</plugin>
+	</gazebo>
 
 </robot>
