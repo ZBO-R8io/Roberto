@@ -47,6 +47,27 @@
       <axis xyz="0 1 0"/>
       <origin rpy="0 0 0" xyz="${reflect_x * 0.3} ${reflect_y * 0.375} ${reflect_z * 0.075}"/>
     </joint>
+    
+    <!--Connects Gazebo to ROS Controls-->
+    <transmission name="joint_${suffix}_wheel_trans">
+      <type>transmission_interface/SimpleTransmission</type>
+      <actuator name="joint_${suffix}_wheel_motor">
+        <mechanicalReduction>1</mechanicalReduction>
+      </actuator>
+      <joint name="joint_${suffix}">
+        <hardwareInterface>hardware_interface/VelocityJointInterface</hardwareInterface>
+      </joint>
+    </transmission>
+    
+    <!--Some extra Gazebo details-->
+    <gazebo reference="link_${suffix}">
+      <mu1 value="200.0"/>
+      <mu2 value="100.0"/>
+      <kp value="10000000.0" />
+      <kd value="1.0" />
+      <material>Gazebo/Blue</material>
+    </gazebo>
+    
   </xacro:macro>
 
   <!--Links-->
@@ -71,6 +92,9 @@
       <!--6 values: ixx ixy ixz iyy iyz izz-->
       <inertia ixx="4.05" ixy="0" ixz="0" iyy="9.82" iyz="0" izz="12.25"/>
     </inertial>
+    <gazebo>
+      <material>Gazebo/Grey</material>
+    </gazebo>
   </link>
 
   <!--wheel/joint_0-->
@@ -82,7 +106,7 @@
   <!--wheel/joint_3-->
   <xacro:wheel suffix="3" reflect_x="-1" reflect_y="-1" reflect_z="-1" />
 
-	<!--Plugin ties Gazebo to ROS-->
+	<!--Gazebo plugin for ROS controls-->
 	<gazebo>
 		<plugin name="gazebo_ros_control" filename="libgazebo_ros_control.so">
 			<robotNamespace>/</robotNamespace>

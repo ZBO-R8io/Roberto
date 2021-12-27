@@ -34,6 +34,9 @@
       <!--6 values: ixx ixy ixz iyy iyz izz-->
       <inertia ixx="4.05" ixy="0" ixz="0" iyy="9.82" iyz="0" izz="12.25"/>
     </inertial>
+    <gazebo>
+      <material>Gazebo/Grey</material>
+    </gazebo>
   </link>
   <link name="link_0">
     <visual>
@@ -60,6 +63,24 @@
     <axis xyz="0 1 0"/>
     <origin rpy="0 0 0" xyz="0.3 0.375 -0.075"/>
   </joint>
+  <!--Connects Gazebo to ROS Controls-->
+  <transmission name="joint_0_wheel_trans">
+    <type>transmission_interface/SimpleTransmission</type>
+    <actuator name="joint_0_wheel_motor">
+      <mechanicalReduction>1</mechanicalReduction>
+    </actuator>
+    <joint name="joint_0">
+      <hardwareInterface>hardware_interface/VelocityJointInterface</hardwareInterface>
+    </joint>
+  </transmission>
+  <!--Some extra Gazebo details-->
+  <gazebo reference="link_0">
+    <mu1 value="200.0"/>
+    <mu2 value="100.0"/>
+    <kp value="10000000.0"/>
+    <kd value="1.0"/>
+    <material>Gazebo/Blue</material>
+  </gazebo>
   <link name="link_1">
     <visual>
       <geometry>
@@ -85,6 +106,24 @@
     <axis xyz="0 1 0"/>
     <origin rpy="0 0 0" xyz="0.3 -0.375 -0.075"/>
   </joint>
+  <!--Connects Gazebo to ROS Controls-->
+  <transmission name="joint_1_wheel_trans">
+    <type>transmission_interface/SimpleTransmission</type>
+    <actuator name="joint_1_wheel_motor">
+      <mechanicalReduction>1</mechanicalReduction>
+    </actuator>
+    <joint name="joint_1">
+      <hardwareInterface>hardware_interface/VelocityJointInterface</hardwareInterface>
+    </joint>
+  </transmission>
+  <!--Some extra Gazebo details-->
+  <gazebo reference="link_1">
+    <mu1 value="200.0"/>
+    <mu2 value="100.0"/>
+    <kp value="10000000.0"/>
+    <kd value="1.0"/>
+    <material>Gazebo/Blue</material>
+  </gazebo>
   <link name="link_2">
     <visual>
       <geometry>
@@ -110,6 +149,24 @@
     <axis xyz="0 1 0"/>
     <origin rpy="0 0 0" xyz="-0.3 0.375 -0.075"/>
   </joint>
+  <!--Connects Gazebo to ROS Controls-->
+  <transmission name="joint_2_wheel_trans">
+    <type>transmission_interface/SimpleTransmission</type>
+    <actuator name="joint_2_wheel_motor">
+      <mechanicalReduction>1</mechanicalReduction>
+    </actuator>
+    <joint name="joint_2">
+      <hardwareInterface>hardware_interface/VelocityJointInterface</hardwareInterface>
+    </joint>
+  </transmission>
+  <!--Some extra Gazebo details-->
+  <gazebo reference="link_2">
+    <mu1 value="200.0"/>
+    <mu2 value="100.0"/>
+    <kp value="10000000.0"/>
+    <kd value="1.0"/>
+    <material>Gazebo/Blue</material>
+  </gazebo>
   <link name="link_3">
     <visual>
       <geometry>
@@ -135,7 +192,25 @@
     <axis xyz="0 1 0"/>
     <origin rpy="0 0 0" xyz="-0.3 -0.375 -0.075"/>
   </joint>
-  <!--Plugin ties Gazebo to ROS-->
+  <!--Connects Gazebo to ROS Controls-->
+  <transmission name="joint_3_wheel_trans">
+    <type>transmission_interface/SimpleTransmission</type>
+    <actuator name="joint_3_wheel_motor">
+      <mechanicalReduction>1</mechanicalReduction>
+    </actuator>
+    <joint name="joint_3">
+      <hardwareInterface>hardware_interface/VelocityJointInterface</hardwareInterface>
+    </joint>
+  </transmission>
+  <!--Some extra Gazebo details-->
+  <gazebo reference="link_3">
+    <mu1 value="200.0"/>
+    <mu2 value="100.0"/>
+    <kp value="10000000.0"/>
+    <kd value="1.0"/>
+    <material>Gazebo/Blue</material>
+  </gazebo>
+  <!--Gazebo plugin for ROS controls-->
   <gazebo>
     <plugin filename="libgazebo_ros_control.so" name="gazebo_ros_control">
       <robotNamespace>/</robotNamespace>
