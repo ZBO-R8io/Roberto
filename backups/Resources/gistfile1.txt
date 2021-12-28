@@ -123,3 +123,22 @@ cp joint_state_publisher_gui ~/ros_catkin_ws/src/joint_state_publisher_gui
 # build the package
 cd ~/ros_catkin_ws
 catkin build joint_state_publisher_gui
+
+# use git to clone teleop_twist_keyboard
+cd ~
+git clone https://github.com/ros-teleop/teleop_twist_keyboard.git
+
+# copy teleop_twist_keyboard to ros_catkin_ws/src
+cp ~/teleop_twist_keyboard ~/ros_catkin_ws/src/teleop_twist_keyboard
+
+# build the package
+cd ~/ros_catkin_ws
+catkin build teleop_twist_keyboard
+
+# create alias for teleop_twist_keyboard
+nano ~/.bashrc *scroll all the way to the bottom*
+alias teleop="rosrun teleop_twist_keyboard teleop_twist_keyboard.py cmd_vel:=/lunarbot_diff_drive_controller/cmd_vel"
+CTL-X
+Y
+"Enter"
+source ~/.bashrc
