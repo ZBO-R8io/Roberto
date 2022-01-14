@@ -1,0 +1,14 @@
+# ros_controllers
+https://github.com/ros-controls/ros_controllers.git
+
+# joint_state_publisher
+https://github.com/ros/joint_state_publisher.git
+
+# teleop_twist_keyboard
+https://github.com/ros-teleop/teleop_twist_keyboard.git
+
+# joystick_drivers
+https://github.com/ros-drivers/joystick_drivers.git
+
+# ros_control
+https://github.com/ros-controls/ros_control.git
