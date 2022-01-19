@@ -66,3 +66,8 @@ rosbag play <your bagfile>
 rosbag play -r 2 <your bagfile>
 
 rosbag record -O subset [topic1] [topic2]
+
+rosservice call controller_manager/list_controller_types
+
+rosrun rqt_controller_manager rqt_controller_manager &
+
