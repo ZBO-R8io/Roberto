@@ -1,0 +1,4 @@
+  # Position Controller --------------------
+    type: "position_controllers/JointPositionController"
+    joint: joint_5
+    pid: {p: 100.0, i: 0.01, d: 10.0}

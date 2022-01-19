@@ -1,17 +1,17 @@
 <?xml version="1.0"?>
 
-<!--Name of robot-->
-<robot xmlns:xacro="http://www.ros.org/wiki/xacro" name="Roberto_MkII">
+<!--Name of Robot-->
+<robot name="Roberto_MkII" xmlns:xacro="http://www.ros.org/wiki/xacro">
 
-  <!--Naming Materials-->
+  <!--Materials-->
   <material name="blue">
     <color rgba="0 0 0.8 1"/>
   </material>
-
+  
   <material name="white">
     <color rgba="1 1 1 1"/>
   </material>
-
+  
   <material name="black">
     <color rgba="0 0 0 1"/>
   </material>
@@ -19,15 +19,49 @@
   <material name="green">
     <color rgba="0 1 0 1"/>
   </material>
-
-  <!--Xacro Macros-->
-  <!--Body Macros-->
-  <xacro:property name="body_size" value="1.5 0.8 .3" />
-
+  
+  <!--Default Inertial-->
+  <xacro:macro name="default_inertial" params="mass">
+    <inertial>
+      <mass value="${mass}"/>
+      <inertia ixx="1.0" ixy="0" ixz="0" iyy="1.0" iyz="0" izz="1.0"/>
+    </inertial>
+  </xacro:macro>
+  
+  <!--Body (base_link) Macros-->
+  <xacro:property name="body_size" value="1.5 0.8 0.3"/>
+  <xacro:property name="body_mass" value="10"/>
+  <xacro:property name="body_color" value="white"/>
+  <xacro:macro name="body" params="name">
+    <link name="${name}_link">
+      <visual>
+        <geometry>
+          <mesh filename="package://lunarbot/meshes/base_link2.stl"/>
+        </geometry>
+        <material name="${body_color}"/>
+     </visual>
+     <collision>
+       <geometry>
+         <box size="${body_size}"/>
+       </geometry>
+     </collision>
+     <xacro:default_inertial mass="${body_mass}"/>
+    </link>
+    
+    <gazebo>
+      <material>Gazebo/Grey</material>
+    </gazebo>
+  </xacro:macro>
+  <xacro:body name="base"/>
+  
   <!--Wheel Macros-->
-  <xacro:property name="wheel_len" value=".15" />
-  <xacro:property name="wheel_rad" value=".3" />
+  <xacro:property name="wheel_len" value="0.15" />
+  <xacro:property name="wheel_rad" value="0.3" />
   <xacro:property name="wheel_origin" value="1.57075 0 0" />
+  <xacro:property name="wheel_color" value="blue"/>
+  <xacro:property name="wheel_mass" value="5"/>
+  <xacro:property name="wheel_joint_type" value="continuous"/>
+  <xacro:property name="wheel_joint_axis" value="0 1 0"/>
   <xacro:macro name="wheel" params="suffix reflect_x reflect_y reflect_z">
     <link name="link_${suffix}">
       <visual>
@@ -35,7 +69,7 @@
           <cylinder length="${wheel_len}" radius="${wheel_rad}"/>
         </geometry>
         <origin rpy="${wheel_origin}"/>
-        <material name="blue"/>
+        <material name="${wheel_color}"/>
       </visual>
       <collision>
         <geometry>
@@ -43,23 +77,21 @@
         </geometry>
         <origin rpy="${wheel_origin}"/>
       </collision>
-      <inertial>
-        <mass value="12.01"/>
-        <inertia ixx=".14" ixy="0" ixz="0" iyy="0.24" iyz="0" izz=".14"/>
-      </inertial>
+      <xacro:default_inertial mass="${wheel_mass}"/>
     </link>
 
-    <joint name="joint_${suffix}" type="continuous">
+    <joint name="joint_${suffix}" type="${wheel_joint_type}">
       <parent link="base_link"/>
       <child link="link_${suffix}"/>
-      <axis xyz="0 1 0"/>
+      <axis xyz="${wheel_joint_axis}"/>
       <origin xyz="${reflect_x * 0.6} ${reflect_y * 0.475} ${reflect_z * 0.075}"/>
     </joint>
-    
-    <!--Connects Gazebo to ROS Controls-->
+
     <transmission name="joint_${suffix}_wheel_trans">
       <type>transmission_interface/SimpleTransmission</type>
       <actuator name="joint_${suffix}_wheel_motor">
+        <hardwareInterface>hardware_interface/VelocityJointInterface
+        </hardwareInterface>
         <mechanicalReduction>1</mechanicalReduction>
       </actuator>
       <joint name="joint_${suffix}">
@@ -67,8 +99,7 @@
         </hardwareInterface>
       </joint>
     </transmission>
-    
-    <!--Some extra Gazebo details-->
+
     <gazebo reference="link_${suffix}">
       <mu1 value="200.0"/>
       <mu2 value="100.0"/>
@@ -77,33 +108,6 @@
       <material>Gazebo/Blue</material>
     </gazebo>
   </xacro:macro>
-
-  <!--Links-->
-  <!--Body(base_link)-->
-  <link name="base_link">
-    <!--Visual-->
-    <visual>
-      <geometry>
-        <mesh filename="package://lunarbot/meshes/base_link2.stl"/>
-      </geometry>
-      <material name="white"/>
-    </visual>
-    <!--Collision-->
-    <collision>
-      <geometry>
-        <box size="${body_size}"/>
-      </geometry>
-    </collision>
-    <inertial>
-      <mass value="108.09"/>
-      <!--inertia: required by Gazebo-->  
-      <!--6 values: ixx ixy ixz iyy iyz izz-->
-      <inertia ixx="4.05" ixy="0" ixz="0" iyy="9.82" iyz="0" izz="12.25"/>
-    </inertial>
-    <gazebo>
-      <material>Gazebo/Grey</material>
-    </gazebo>
-  </link>
 
   <!--wheel/joint_0-->
   <xacro:wheel suffix="0" reflect_x="1" reflect_y="1" reflect_z="-1" />
@@ -114,95 +118,171 @@
   <!--wheel/joint_3-->
   <xacro:wheel suffix="3" reflect_x="-1" reflect_y="-1" reflect_z="-1" />
 
-  <link name="auger">
-    <visual>
-      <origin xyz="0 0 -1.2"/>
-      <geometry>
-         <mesh filename="package://lunarbot/meshes/auger.stl"/>
-      </geometry>
-      <material name="black"/>
-    </visual>
-    <collision>
-      <geometry>
-        <cylinder length="1.05" radius=".18"/>
-      </geometry>
-      <origin xyz="0 0 -.565"/>
-    </collision>
-    <inertial>
-      <mass value="33"/>
-      <inertia ixx="4.73" ixy="0" ixz="0" iyy="4.73" iyz="0" izz=".165"/>
-    </inertial>
-  </link>
+  <!--Link_4 Macros-->
+  <xacro:property name="link_4_size" value="0.05 0.1 0.8"/>
+  <xacro:property name="link_4_origin" value="0 0 0.3"/>
+  <xacro:property name="link_4_color" value="green"/>
+  <xacro:property name="link_4_mass" value="3"/>
+  <xacro:property name="joint_4_type" value="fixed"/>
+  <xacro:property name="joint_4_origin_rpy" value="0 -0.85 0"/>
+  <xacro:property name="joint_4_origin_xyz" value="-0.25 0 -0.05"/>
+  <xacro:macro name="link_4" params="num">
+    <link name="link_${num}">
+      <visual>
+        <geometry>
+          <box size="${link_4_size}"/>
+        </geometry>
+        <origin xyz="${link_4_origin}"/>
+        <material name="${link_4_color}"/>
+      </visual>
+      <collision>
+        <geometry>
+          <box size="${link_4_size}"/>
+        </geometry>
+        <origin xyz="${link_4_origin}"/>
+      </collision>
+      <xacro:default_inertial mass="${link_4_mass}"/>
+    </link>
   
-  <joint name="auger_joint" type="continuous">
-    <parent link="link_5"/>
-    <child link="auger"/>
-    <axis xyz="0 0 1"/>
-    <origin xyz=".23 0 0"/>
-  </joint>
-  
-  <transmission name="auger_joint_trans">
-    <type>transmission_interface/SimpleTransmission</type>
-    <actuator name="auger_joint_motor">
-      <mechanicalReduction>1</mechanicalReduction>
-    </actuator>
-    <joint name="auger_joint">
-      <hardwareInterface>hardware_interface/VelocityJointInterface
-      </hardwareInterface>
+    <joint name="joint_${num}" type="${joint_4_type}">
+      <parent link="base_link"/>
+      <child link="link_${num}"/>
+      <origin rpy="${joint_4_origin_rpy}" xyz="${joint_4_origin_xyz}"/>
     </joint>
-  </transmission>
-
-  <link name="link_4">
-    <visual>
-      <geometry>
-        <box size=".05 .1 .8"/>
-      </geometry>
-      <origin xyz="0 0 .3"/>
-      <material name="green"/>
-    </visual>
-    <gazebo>
+    
+    <gazebo reference="link_${num}">
       <material>Gazebo/Yellow</material>
     </gazebo>
-  </link>
+  </xacro:macro>
+  <xacro:link_4 num="4"/>
   
-  <joint name="joint_4" type="fixed">
-    <parent link="base_link"/>
-    <child link="link_4"/>
-    <origin rpy="0 -.85 0" xyz="-.25 0 -.05"/>
-  </joint>
+  <!--Link_5 Macros-->
+  <xacro:property name="link_5_size" value="0.1 0.1 0.3"/>
+  <xacro:property name="link_5_origin_rpy" value="0 1.575 0"/>
+  <xacro:property name="link_5_origin_xyz" value="0.15 0 0"/>
+  <xacro:property name="link_5_color" value="blue"/>
+  <xacro:property name="link_5_mass" value="2"/>
+  <xacro:property name="joint_5_type" value="prismatic"/>
+  <xacro:property name="joint_5_axis" value="0 0 1"/>
+  <xacro:property name="joint_5_effort" value="1000"/>
+  <xacro:property name="joint_5_upper_limit" value="0"/>
+  <xacro:property name="joint_5_lower_limit" value="-0.55"/>
+  <xacro:property name="joint_5_velocity" value="0.5"/>
+  <xacro:property name="joint_5_origin" value="0 0 0.65"/>
+  <xacro:macro name="link_5" params="num">
+    <link name="link_${num}">
+      <visual>
+        <geometry>
+          <box size="${link_5_size}"/>
+        </geometry>
+        <origin rpy="${link_5_origin_rpy}" xyz="${link_5_origin_xyz}"/>
+        <material name="${link_5_color}"/>
+      </visual>
+      <collision>
+        <geometry>
+          <box size="${link_5_size}"/>
+        </geometry>
+        <origin rpy="${link_5_origin_rpy}" xyz="${link_5_origin_xyz}"/>
+      </collision>
+      <xacro:default_inertial mass="${link_5_mass}"/>
+    </link>
 
-  <link name="link_5">
-    <visual>
-      <geometry>
-        <box size=".1 .1 .3"/>
-      </geometry>
-      <origin rpy="0 1.575 0" xyz=".15 0 0"/>
-      <material name="blue"/>
-    </visual>
-  </link>
-
-  <joint name="joint_5" type="prismatic">
-    <parent link="link_4"/>
-    <child link="link_5"/>
-    <axis xyz="0 0 1"/>
-    <limit effort="1000" lower="-.55" upper="0" velocity=".5"/>
-    <origin xyz="0 0 .65"/>
-  </joint>
-
-  <transmission name="joint_5_trans">
-    <type>transmission_interface/SimpleTransmission</type>
-    <actuator name="joint_5_motor">
-      <mechanicalReduction>1</mechanicalReduction>
-    </actuator>
-    <joint name="joint_5">
-      <hardwareInterface>hardware_interface/EffortJointInterface
-      </hardwareInterface>
+    <joint name="joint_${num}" type="prismatic">
+      <parent link="link_4"/>
+      <child link="link_${num}"/>
+      <axis xyz="${joint_5_axis}"/>
+      <limit effort="${joint_5_effort}"
+                upper="${joint_5_upper_limit}"
+                lower="${joint_5_lower_limit}"
+                velocity="${joint_5_velocity}"/>
+      <origin xyz="${joint_5_origin}"/>
     </joint>
-  </transmission>
 
-	<!--Gazebo plugin for ROS controls-->
-	<gazebo>
+    <transmission name="joint_${num}_trans">
+      <type>transmission_interface/SimpleTransmission</type>
+      <actuator name="joint_${num}_motor">
+        <hardwareInterface>hardware_interface/PositionJointInterface
+        </hardwareInterface>
+        <mechanicalReduction>1</mechanicalReduction>
+      </actuator>
+      <joint name="joint_${num}">
+        <hardwareInterface>hardware_interface/PositionJointInterface
+        </hardwareInterface>
+      </joint>
+    </transmission>
+    
+    <gazebo reference="link_${num}">
+      <mu1 value="200.0"/>
+      <mu2 value="100.0"/>
+      <kp value="10000000.0"/>
+      <kd value="1.0"/>
+      <material>Gazebo/Blue</material>
+    </gazebo>
+  </xacro:macro>
+  <xacro:link_5 num="5"/>
+  
+  <!--Auger Macros-->
+  <xacro:property name="auger_link_origin" value="0 0 -1.2"/>
+  <xacro:property name="auger_color" value="black"/>
+  <xacro:property name="auger_collision_len" value="0.4"/>
+  <xacro:property name="auger_collision_rad" value="0.18"/>
+  <xacro:property name="auger_collision_origin" value="0 0 -0.4"/>
+  <xacro:property name="auger_mass" value="5"/>
+  <xacro:property name="auger_joint_type" value="continuous"/>
+  <xacro:property name="auger_joint_axis" value="0 0 1"/>
+  <xacro:property name="auger_joint_origin" value="0.23 0 0"/>
+  <xacro:macro name="drill" params="type">
+    <link name="${type}_link">
+      <visual>
+        <origin xyz="${auger_link_origin}"/>
+        <geometry>
+           <mesh filename="package://lunarbot/meshes/auger.stl"/>
+        </geometry>
+        <material name="${auger_color}"/>
+      </visual>
+      <collision>
+        <geometry>
+          <cylinder length="${auger_collision_len}"
+                           radius="${auger_collision_rad}"/>
+        </geometry>
+        <origin xyz="${auger_collision_origin}"/>
+      </collision>
+      <xacro:default_inertial mass="${auger_mass}"/>
+    </link>
+  
+    <joint name="${type}_joint" type="${auger_joint_type}">
+      <parent link="link_5"/>
+      <child link="${type}_link"/>
+      <axis xyz="${auger_joint_axis}"/>
+      <origin xyz="${auger_joint_origin}"/>
+    </joint>
+  
+    <transmission name="${type}_joint_trans">
+      <type>transmission_interface/SimpleTransmission</type>
+      <actuator name="${type}_joint_motor">
+        <hardwareInterface>hardware_interface/VelocityJointInterface
+        </hardwareInterface>
+        <mechanicalReduction>1</mechanicalReduction>
+      </actuator>
+      <joint name="${type}_joint">
+        <hardwareInterface>hardware_interface/VelocityJointInterface
+        </hardwareInterface>
+      </joint>
+    </transmission>
+    
+    <gazebo reference="${type}_link">
+      <mu1 value="200.0"/>
+      <mu2 value="100.0"/>
+      <kp value="10000000.0"/>
+      <kd value="1.0"/>
+      <material>Gazebo/Black</material>
+    </gazebo>
+  </xacro:macro>
+  <xacro:drill type="auger"/>
+  
+  <!--Gazebo plugin for ros_control-->
+  <gazebo>
 	  <plugin name="gazebo_ros_control" filename="libgazebo_ros_control.so"/>
+	  <robotNamespace>/lunarbot</robotNamespace>
 	</gazebo>
-
 </robot>
